@@ -116,4 +116,12 @@ write.table(temp_teo, file = file.path("~/BCB546X_R_Assignment/Teosinte/Descendi
 }
 ```
 
-## GGPlot
+## Load GGPlot Functions
+```{r}
+library(ggplot2)
+library(reshape2)
+library(tidyr)
+library(dplyr)
+```
+
+## 
