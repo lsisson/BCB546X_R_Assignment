@@ -1,0 +1,113 @@
+---
+title: "BCB546X_R_Assignment"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading the files in to variables to work with
+```{r}
+fang_genotypes<-read.delim(file = "~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/fang_et_al_genotypes.txt", header=T)
+snps<-read.delim(file = "~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/snp_position.txt")
+```
+
+## Looking at the files
+```{r}
+head(fang_genotypes)
+head(snps)
+tail(fang_genotypes)
+tail(snps)
+ncol(fang_genotypes)
+ncol(snps)
+nrow(fang_genotypes)
+nrow(snps)
+names(fang_genotypes)
+names(snps)
+class(fang_genotypes)
+class(snps)
+count(fang_genotypes, "Group")
+```
+
+## Trimming the SNPs variable to contain only the columns we want
+
+```{r}
+trimmed_snps<-snps[c("SNP_ID","Chromosome", "Position")]
+```
+
+## Extracting Maize Genotypes by selecting specified groups
+
+```{r}
+maize<-filter(fang_genotypes, `Group` == "ZMMIL" | `Group` == "ZMMLR" | `Group` == "ZMMMR")
+```
+
+## Extracting Teosinte Genotypes by selecting specified groups
+
+```{r}
+teosinte<-filter(fang_genotypes, `Group` == "ZMPBA" | `Group` == "ZMPIL" | `Group` == "ZMPJA")
+```
+
+## Transposing Teosinte and Maize Genotypes
+```{r}
+maize_transposed<-as.data.frame(t(maize))
+teosinte_transposed<-as.data.frame(t(teosinte))
+```
+
+## Looking at the transposed variables
+```{r}
+dim(maize_transposed)
+dim(teosinte_transposed)
+```
+
+## Merging the SNPs and the Maize/Teosinte Genotype files. Need to have the SNPs in the first poisition in the merge command in order to have the SNP_ID, Chromosome, and Position as the first three columns in the merged file.
+```{r}
+joined_maize<-merge(trimmed_snps, maize_transposed, by.x = 1, by.y = 0)
+joined_teosinte<-merge(trimmed_snps, teosinte_transposed, by.x = 1, by.y = 0)
+```
+
+## Separating out the unknown and multiple chromosome/position rows and writing them to documents
+```{r}
+unknown_maize<-filter(joined_maize, Chromosome == "unknown" | Position == "unknown")
+write.table(unknown_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/", paste('unknown_maize.txt')), sep='\t', row.names=FALSE)
+multiple_maize<-filter(joined_maize, Chromosome == "multiple" | Position == "multiple")
+write.table(multiple_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/", paste('multiple_maize.txt')), sep='\t', row.names=FALSE)
+unknown_teosinte<-filter(joined_teosinte, Chromosome == "unknown" | Position == "unknown")
+write.table(unknown_teosinte, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/", paste('unknown_teosinte.txt')), sep='\t', row.names=FALSE)
+multiple_teosinte<-filter(joined_teosinte, Chromosome == "multiple" | Position == "multiple")
+write.table(multiple_teosinte, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/", paste('multiple_teosinte.txt')), sep='\t', row.names=FALSE)
+```
+
+## Separating by chromosome and sorting by increasing position and writing the data to documents
+```{r}
+for (i in 1:10){
+temp_maize<-filter(joined_maize, `Chromosome`==i & Position != "unknown" & Position != "multiple")
+temp_maize<-arrange(temp_maize, Position)
+write.table(temp_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/Ascending/", paste0('maize_chromosome_ascending_',i,'.txt')), sep='\t', row.names=FALSE)
+}
+
+for (i in 1:10){
+temp_teo<-subset(joined_teosinte, `Chromosome`== i & Position != "unknown" & Position != "multiple")
+temp_teo<-arrange(temp_teo, Position)
+write.table(temp_teo, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/Ascending/", paste0('teosinte_chromosome_ascending_',i,'txt')), sep='\t', row.names=FALSE)
+}
+```
+
+## Separating by chromosome and sorting by decreasing position and replacing all occurences of '?' with '-' and then writing the data to documents
+```{r}
+for (i in 1:10){
+temp_maize<-filter(joined_maize, `Chromosome`==i & Position != "unknown" & Position != "multiple")
+temp_maize<-arrange(temp_maize, desc(Position))
+temp_maize<-sapply(temp_maize, gsub, pattern = "?", replacement = "-", fixed = TRUE)
+write.table(temp_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/Descending/", paste0('maize_chromosome_descending_',i,'.txt')), sep='\t', row.names=FALSE)
+}
+
+for (i in 1:10){
+temp_teo<-filter(joined_teosinte, `Chromosome`==i & Position != "unknown" & Position != "multiple")
+temp_teo<-arrange(temp_teo, desc(Position))
+temp_teo<-sapply(temp_teo, gsub, pattern = "?", replacement = "-", fixed = TRUE)
+write.table(temp_teo, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/Descending/", paste0('teosinte_chromosome_descending_',i,'.txt')), sep='\t', row.names=FALSE)
+}
+```
+
+## GGPlot
