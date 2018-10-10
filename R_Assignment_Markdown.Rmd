@@ -69,13 +69,13 @@ joined_teosinte<-merge(trimmed_snps, teosinte_transposed, by.x = 1, by.y = 0)
 ## Separating out the unknown and multiple chromosome/position rows and writing them to documents
 ```{r}
 unknown_maize<-filter(joined_maize, Chromosome == "unknown" | Position == "unknown")
-write.table(unknown_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/", paste('unknown_maize.txt')), sep='\t', row.names=FALSE)
+write.table(unknown_maize, file = file.path("~/BCB546X_R_Assignment/Maize/", paste('unknown_maize.txt')), sep='\t', row.names=FALSE)
 multiple_maize<-filter(joined_maize, Chromosome == "multiple" | Position == "multiple")
-write.table(multiple_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/", paste('multiple_maize.txt')), sep='\t', row.names=FALSE)
+write.table(multiple_maize, file = file.path("~/BCB546X_R_Assignment/Maize/", paste('multiple_maize.txt')), sep='\t', row.names=FALSE)
 unknown_teosinte<-filter(joined_teosinte, Chromosome == "unknown" | Position == "unknown")
-write.table(unknown_teosinte, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/", paste('unknown_teosinte.txt')), sep='\t', row.names=FALSE)
+write.table(unknown_teosinte, file = file.path("~/BCB546X_R_Assignment/Teosinte/", paste('unknown_teosinte.txt')), sep='\t', row.names=FALSE)
 multiple_teosinte<-filter(joined_teosinte, Chromosome == "multiple" | Position == "multiple")
-write.table(multiple_teosinte, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/", paste('multiple_teosinte.txt')), sep='\t', row.names=FALSE)
+write.table(multiple_teosinte, file = file.path("~/BCB546X_R_Assignment/Teosinte/", paste('multiple_teosinte.txt')), sep='\t', row.names=FALSE)
 ```
 
 ## Separating by chromosome and sorting by increasing position and writing the data to documents
@@ -83,13 +83,13 @@ write.table(multiple_teosinte, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall
 for (i in 1:10){
 temp_maize<-filter(joined_maize, `Chromosome`==i & Position != "unknown" & Position != "multiple")
 temp_maize<-arrange(temp_maize, Position)
-write.table(temp_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/Ascending/", paste0('maize_chromosome_ascending_',i,'.txt')), sep='\t', row.names=FALSE)
+write.table(temp_maize, file = file.path("~/BCB546X_R_Assignment/Maize/Ascending/", paste0('maize_chromosome_ascending_',i,'.txt')), sep='\t', row.names=FALSE)
 }
 
 for (i in 1:10){
 temp_teo<-subset(joined_teosinte, `Chromosome`== i & Position != "unknown" & Position != "multiple")
 temp_teo<-arrange(temp_teo, Position)
-write.table(temp_teo, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/Ascending/", paste0('teosinte_chromosome_ascending_',i,'txt')), sep='\t', row.names=FALSE)
+write.table(temp_teo, file = file.path("~/BCB546X_R_Assignment/Teosinte/Ascending/", paste0('teosinte_chromosome_ascending_',i,'txt')), sep='\t', row.names=FALSE)
 }
 ```
 
@@ -99,14 +99,14 @@ for (i in 1:10){
 temp_maize<-filter(joined_maize, `Chromosome`==i & Position != "unknown" & Position != "multiple")
 temp_maize<-arrange(temp_maize, desc(Position))
 temp_maize<-sapply(temp_maize, gsub, pattern = "?", replacement = "-", fixed = TRUE)
-write.table(temp_maize, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Maize/Descending/", paste0('maize_chromosome_descending_',i,'.txt')), sep='\t', row.names=FALSE)
+write.table(temp_maize, file = file.path("~/BCB546X_R_Assignment/Maize/Descending/", paste0('maize_chromosome_descending_',i,'.txt')), sep='\t', row.names=FALSE)
 }
 
 for (i in 1:10){
 temp_teo<-filter(joined_teosinte, `Chromosome`==i & Position != "unknown" & Position != "multiple")
 temp_teo<-arrange(temp_teo, desc(Position))
 temp_teo<-sapply(temp_teo, gsub, pattern = "?", replacement = "-", fixed = TRUE)
-write.table(temp_teo, file = file.path("~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/Teosinte/Descending/", paste0('teosinte_chromosome_descending_',i,'.txt')), sep='\t', row.names=FALSE)
+write.table(temp_teo, file = file.path("~/BCB546X_R_Assignment/Teosinte/Descending/", paste0('teosinte_chromosome_descending_',i,'.txt')), sep='\t', row.names=FALSE)
 }
 ```
 
