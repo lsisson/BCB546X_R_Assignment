@@ -9,8 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Reading the files in to variables to work with
 ```{r}
-fang_genotypes<-read.delim(file = "~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/fang_et_al_genotypes.txt", header=T)
-snps<-read.delim(file = "~/EEOB546_R_lesson/BCB546X-Fall2018/assignments/R_Assignment/snp_position.txt")
+fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
+snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
 ```
 
 ## Looking at the files
