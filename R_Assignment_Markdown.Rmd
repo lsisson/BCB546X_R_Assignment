@@ -7,6 +7,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Load functions that we need
+
+```{r}
+library(dplyr)
+```
+
 ## Reading the files in to variables to work with
 ```{r}
 fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
