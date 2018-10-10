@@ -124,4 +124,27 @@ library(tidyr)
 library(dplyr)
 ```
 
-## 
+## Load in the data for visualization and remove unnecessary columns
+```{r}
+fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
+fang<-fang_genotypes[,-1:-2]
+snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
+trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
+```
+
+## Melting the data
+```{r}
+melted_fang<-melt(fang, id = c("Group"))
+melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
+```
+
+
+```{r}
+joined_genotype<-merge(melted_snps, melted_fang, by.x = 1, by.y = 2)
+```
+
+```{r}
+ggplot, aes(x=Sepal.Length, y=Sepal.Width)) + 
+    geom_point()
+```
+
