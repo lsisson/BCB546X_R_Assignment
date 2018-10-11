@@ -177,6 +177,7 @@ colnames(melted_geno)[2:3] <- c("SNP_ID","SNP_Seq")
 melted_geno$SNP_Status<-"NA"
 melted_geno$SNP_Status<-melted_geno$SNP_Seq
 melted_geno$SNP_Status[melted_geno$SNP_Status=="?/?"]<- "NA"
-melted_geno$SNP_Status[melted_geno$SNP_Status=="A/A"]
+melted_geno$SNP_Status[melted_geno$SNP_Status=="A/A" | melted_geno$SNP_Status=="C/C" | melted_geno$SNP_Status=="G/G" | melted_geno$SNP_Status=="T/T"] <- "Hom"
+recoded_geno<-melted_geno$SNP_Status[melted_geno$SNP_Status!="Hom" & melted_geno$SNP_Status!="NA"] <- "Het"
 ```
 
