@@ -171,3 +171,12 @@ melted_geno<-melt(fang, id = c("Group"))
 melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
 colnames(melted_geno)[2:3] <- c("SNP_ID","SNP_Seq")
 ```
+
+## Adding SNP_Status column and coding ?/? to NA, Homozygous to Hom, and Heterozygous to Het
+```{r}
+melted_geno$SNP_Status<-"NA"
+melted_geno$SNP_Status<-melted_geno$SNP_Seq
+melted_geno$SNP_Status[melted_geno$SNP_Status=="?/?"]<- "NA"
+melted_geno$SNP_Status[melted_geno$SNP_Status=="A/A"]
+```
+
