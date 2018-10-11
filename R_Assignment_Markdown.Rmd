@@ -132,8 +132,6 @@ snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", head
 trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
 ```
 
-
-
 ## Melting the data
 ```{r}
 melted_geno<-melt(fang, id = c("Group"))
@@ -145,9 +143,31 @@ melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
 joined_geno<-merge(melted_snps, melted_geno, by.x = 1, by.y = 2)
 ```
 
-## Now that I have the joined files, I can plot SNP vs. Chromosom
+## Now that I have the joined files, I can plot SNP vs. Chromosome
 ```{r}
-ggplot, aes(x=Sepal.Length, y=Sepal.Width)) + 
-    geom_point()
+ggplot(joined_geno) + geom_bar(aes(x=Chromosome, fill=Chromosome)) + ggtitle("Number of SNPs/Chromosome") + labs(x="Chromosome",y="SNP Count")
 ```
 
+## What groups contribute the most to the SNPs
+```{r}
+ggplot(joined_geno) + geom_bar(aes(x=Group, fill=Group)) + ggtitle("Number of SNPs/Group") + labs(x="Group",y="SNP Count")
+```
+
+## ZMMIL, ZMMLR, and ZMPBA are the top three contributers of SNPs
+
+## Heterozygosity
+
+## Load in the data for visualization and remove unnecessary columns
+```{r}
+fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
+fang<-fang_genotypes[,-1:-2]
+snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
+trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
+```
+
+## Melting the data and renaming columns
+```{r}
+melted_geno<-melt(fang, id = c("Group"))
+melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
+colnames(melted_geno)[2:3] <- c("SNP_ID","SNP_Seq")
+```
