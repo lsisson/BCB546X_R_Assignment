@@ -132,24 +132,17 @@ snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", head
 trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
 ```
 
-## Trimming the data for each organism
-```{r}
-maize<-filter(fang_genotypes, `Group` == "ZMMIL" | `Group` == "ZMMLR" | `Group` == "ZMMMR")
-teosinte<-filter(fang_genotypes, `Group` == "ZMPBA" | `Group` == "ZMPIL" | `Group` == "ZMPJA")
-```
 
 
 ## Melting the data
 ```{r}
-melted_maize<-melt(maize, id = c("Group"))
-melted_teosinte<-melt(teosinte, id = c("Group"))
+melted_geno<-melt(fang, id = c("Group"))
 melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
 ```
 
-## Joining the data for maize and teosinte with the SNP identifiers
+## Joining the data
 ```{r}
-joined_maize<-merge(melted_snps, melted_maize, by.x = 1, by.y = 2)
-joined_teosinte<-merge(melted_snps, melted_teosinte, by.x = 1, by.y = 2)
+joined_geno<-merge(melted_snps, melted_geno, by.x = 1, by.y = 2)
 ```
 
 ## Now that I have the joined files, I can plot SNP vs. Chromosom
