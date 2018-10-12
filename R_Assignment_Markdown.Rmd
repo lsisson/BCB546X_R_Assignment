@@ -127,14 +127,14 @@ library(dplyr)
 ## Load in the data for visualization and remove unnecessary columns
 ```{r}
 fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
-fang<-fang_genotypes[,-1:-2]
+fang<-fang_genotypes[,-2]
 snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
 trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
 ```
 
 ## Melting the data
 ```{r}
-melted_geno<-melt(fang, id = c("Group"))
+melted_geno<-melt(fang, id = c("Sample_ID", "Group"))
 melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
 ```
 
@@ -160,24 +160,42 @@ ggplot(joined_geno) + geom_bar(aes(x=Group, fill=Group)) + ggtitle("Number of SN
 ## Load in the data for visualization and remove unnecessary columns
 ```{r}
 fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
-fang<-fang_genotypes[,-1:-2]
+fang<-fang_genotypes[,-2]
 snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
 trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
 ```
 
 ## Melting the data and renaming columns
 ```{r}
-melted_geno<-melt(fang, id = c("Group"))
+melted_geno<-melt(fang, id = c("Sample_ID", "Group"))
 melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
-colnames(melted_geno)[2:3] <- c("SNP_ID","SNP_Seq")
+colnames(melted_geno)[3:4] <- c("SNP_ID","SNP_Seq")
 ```
+
+## Merging the files
+```{r}
+joined_melted<-merge(melted_snps, melted_geno, by.x = 1, by.y = 3)
+joined_melted<-joined_melted[,-3]
+```
+
 
 ## Adding SNP_Status column and coding ?/? to NA, Homozygous to Hom, and Heterozygous to Het
 ```{r}
-melted_geno$SNP_Status<-"NA"
-melted_geno$SNP_Status<-melted_geno$SNP_Seq
-melted_geno$SNP_Status[melted_geno$SNP_Status=="?/?"]<- "NA"
-melted_geno$SNP_Status[melted_geno$SNP_Status=="A/A" | melted_geno$SNP_Status=="C/C" | melted_geno$SNP_Status=="G/G" | melted_geno$SNP_Status=="T/T"] <- "Hom"
-recoded_geno<-melted_geno$SNP_Status[melted_geno$SNP_Status!="Hom" & melted_geno$SNP_Status!="NA"] <- "Het"
+joined_melted$SNP_Status<-"NA"
+joined_melted$SNP_Status<-joined_melted$SNP_Seq
+joined_melted$SNP_Status[joined_melted$SNP_Status=="?/?"]<- "NA"
+joined_melted$SNP_Status[joined_melted$SNP_Status=="A/A" | joined_melted$SNP_Status=="C/C" | joined_melted$SNP_Status=="G/G" | joined_melted$SNP_Status=="T/T"] <- "Hom"
+joined_melted$SNP_Status[joined_melted$SNP_Status!="Hom" & joined_melted$SNP_Status!="NA"] <- "Het"
+recoded_geno<-joined_melted
+sorted_recoded<-arrange(recoded_geno, Group, Sample_ID)
 ```
+
+## Graphing the SNP_Status against Chromosome and Group
+```{r}
+ggplot(recoded_geno) + geom_bar(aes(x=Chromosome, fill=SNP_Status)) + ggtitle("SNP Status/Chromosome") + labs(x="Chromosome",y="SNP Status Counts")
+
+ggplot(recoded_geno) + geom_bar(aes(x=Group, fill=SNP_Status)) + ggtitle("SNP Status/Group") + labs(x="Group",y="SNP Status Counts")
+```
+
+
 
