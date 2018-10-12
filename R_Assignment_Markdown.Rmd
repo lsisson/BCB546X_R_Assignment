@@ -157,6 +157,14 @@ ggplot(joined_geno) + geom_bar(aes(x=Group, fill=Group)) + ggtitle("Number of SN
 
 ## Heterozygosity
 
+## Load GGPlot Functions
+```{r}
+library(ggplot2)
+library(reshape2)
+library(tidyr)
+library(dplyr)
+```
+
 ## Load in the data for visualization and remove unnecessary columns
 ```{r}
 fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
@@ -194,7 +202,7 @@ sorted_recoded<-arrange(recoded_geno, Group, Sample_ID)
 ```{r}
 ggplot(recoded_geno) + geom_bar(aes(x=Chromosome, fill=SNP_Status)) + ggtitle("SNP Status/Chromosome") + labs(x="Chromosome",y="SNP Status Counts")
 
-ggplot(recoded_geno) + geom_bar(aes(x=Group, fill=SNP_Status)) + ggtitle("SNP Status/Group") + labs(x="Group",y="SNP Status Counts")
+ggplot(recoded_geno) + geom_bar(aes(x=Group, fill=SNP_Status), position = "fill") + ggtitle("SNP Status/Group") + labs(x="Group",y="SNP Status Counts")
 ```
 
 
