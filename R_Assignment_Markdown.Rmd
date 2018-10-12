@@ -8,18 +8,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Load functions that we need
-
 ```{r}
+library(ggplot2)
+library(reshape2)
+library(tidyr)
 library(dplyr)
 ```
 
-## Reading the files in to variables to work with
+## Reading the files in to variables to work with. The data files are located in the Raw_Data folder in the repository.
 ```{r}
 fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
 snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
 ```
 
-## Looking at the files
+## Looking at the files using Head, Tail, ncol, nrow, names, class, and summarize
 ```{r}
 head(fang_genotypes)
 head(snps)
@@ -33,25 +35,30 @@ names(fang_genotypes)
 names(snps)
 class(fang_genotypes)
 class(snps)
-count(fang_genotypes, "Group")
+fang_genotypes %>% group_by(Group) %>% summarize(count=n())
 ```
 
-## Trimming the SNPs variable to contain only the columns we want
+## "fang_genotypes" has 986 columns and 2782 rows, "snps" has 15 columns and 983 rows, and both variables are data frames. The last line of code gives the number of occurences for each of the groups in fang_genotypes. There are 16 groups with varying number of occurences.
+
+	
+## Trimming the SNPs variable to contain only the columns we want, which are the SNP_ID, Chromosome, and Position.
 
 ```{r}
 trimmed_snps<-snps[c("SNP_ID","Chromosome", "Position")]
 ```
 
-## Extracting Maize Genotypes by selecting specified groups
+## Extracting Maize Genotypes and Teosinte Genotypes by selecting specified groups
 
 ```{r}
 maize<-filter(fang_genotypes, `Group` == "ZMMIL" | `Group` == "ZMMLR" | `Group` == "ZMMMR")
+teosinte<-filter(fang_genotypes, `Group` == "ZMPBA" | `Group` == "ZMPIL" | `Group` == "ZMPJA")
 ```
 
-## Extracting Teosinte Genotypes by selecting specified groups
+## Looking at the dimensions of the extracted variables
 
 ```{r}
-teosinte<-filter(fang_genotypes, `Group` == "ZMPBA" | `Group` == "ZMPIL" | `Group` == "ZMPJA")
+dim(maize)
+dim(teosinte)
 ```
 
 ## Transposing Teosinte and Maize Genotypes
@@ -60,11 +67,12 @@ maize_transposed<-as.data.frame(t(maize))
 teosinte_transposed<-as.data.frame(t(teosinte))
 ```
 
-## Looking at the transposed variables
+## Looking at the dimensions of the transposed variables
 ```{r}
 dim(maize_transposed)
 dim(teosinte_transposed)
 ```
+## The dimensions of the transposed variables are what we expected.
 
 ## Merging the SNPs and the Maize/Teosinte Genotype files. Need to have the SNPs in the first poisition in the merge command in order to have the SNP_ID, Chromosome, and Position as the first three columns in the merged file.
 ```{r}
@@ -72,7 +80,7 @@ joined_maize<-merge(trimmed_snps, maize_transposed, by.x = 1, by.y = 0)
 joined_teosinte<-merge(trimmed_snps, teosinte_transposed, by.x = 1, by.y = 0)
 ```
 
-## Separating out the unknown and multiple chromosome/position rows and writing them to documents
+## Separating out the unknown and multiple chromosome/position rows and writing them to text files.
 ```{r}
 unknown_maize<-filter(joined_maize, Chromosome == "unknown" | Position == "unknown")
 write.table(unknown_maize, file = file.path("~/BCB546X_R_Assignment/Maize/", paste('unknown_maize.txt')), sep='\t', row.names=FALSE)
@@ -84,7 +92,7 @@ multiple_teosinte<-filter(joined_teosinte, Chromosome == "multiple" | Position =
 write.table(multiple_teosinte, file = file.path("~/BCB546X_R_Assignment/Teosinte/", paste('multiple_teosinte.txt')), sep='\t', row.names=FALSE)
 ```
 
-## Separating by chromosome and sorting by increasing position and writing the data to documents
+## Separating by chromosome and sorting by increasing position and writing the data to text files.
 ```{r}
 for (i in 1:10){
 temp_maize<-filter(joined_maize, `Chromosome`==i & Position != "unknown" & Position != "multiple")
@@ -99,7 +107,7 @@ write.table(temp_teo, file = file.path("~/BCB546X_R_Assignment/Teosinte/Ascendin
 }
 ```
 
-## Separating by chromosome and sorting by decreasing position and replacing all occurences of '?' with '-' and then writing the data to documents
+## Separating by chromosome and sorting by decreasing position and replacing all occurences of '?' with '-' and then writing the data to text files.
 ```{r}
 for (i in 1:10){
 temp_maize<-filter(joined_maize, `Chromosome`==i & Position != "unknown" & Position != "multiple")
@@ -116,13 +124,9 @@ write.table(temp_teo, file = file.path("~/BCB546X_R_Assignment/Teosinte/Descendi
 }
 ```
 
-## Load GGPlot Functions
-```{r}
-library(ggplot2)
-library(reshape2)
-library(tidyr)
-library(dplyr)
-```
+## Data Visualization
+
+## Looking at distribution of SNPs on Chromosomes and Group Contribution to SNPs
 
 ## Load in the data for visualization and remove unnecessary columns
 ```{r}
@@ -140,7 +144,7 @@ melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
 
 ## Joining the data
 ```{r}
-joined_geno<-merge(melted_snps, melted_geno, by.x = 1, by.y = 2)
+joined_geno<-merge(melted_snps, melted_geno, by.x = 1, by.y = 3)
 ```
 
 ## Now that I have the joined files, I can plot SNP vs. Chromosome
@@ -157,30 +161,14 @@ ggplot(joined_geno) + geom_bar(aes(x=Group, fill=Group)) + ggtitle("Number of SN
 
 ## Heterozygosity
 
-## Load GGPlot Functions
-```{r}
-library(ggplot2)
-library(reshape2)
-library(tidyr)
-library(dplyr)
-```
-
-## Load in the data for visualization and remove unnecessary columns
-```{r}
-fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
-fang<-fang_genotypes[,-2]
-snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
-trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
-```
-
-## Melting the data and renaming columns
+## Melting the original data for preparation for graphing and manipulation.
 ```{r}
 melted_geno<-melt(fang, id = c("Sample_ID", "Group"))
 melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
 colnames(melted_geno)[3:4] <- c("SNP_ID","SNP_Seq")
 ```
 
-## Merging the files
+## Merging the variables to form the joined melted genotypes file.
 ```{r}
 joined_melted<-merge(melted_snps, melted_geno, by.x = 1, by.y = 3)
 joined_melted<-joined_melted[,-3]
@@ -198,59 +186,16 @@ recoded_geno<-joined_melted
 sorted_recoded<-arrange(recoded_geno, Group, Sample_ID)
 ```
 
-## Graphing the SNP_Status against Chromosome and Group
+## Graphing the SNP_Status against Group and graphing Group against SNP_Status
 ```{r}
-ggplot(recoded_geno) + geom_bar(aes(x=Chromosome, fill=SNP_Status), position = "fill") + ggtitle("SNP Status/Chromosome") + labs(x="Chromosome",y="SNP Status Counts")
+ggplot(recoded_geno) + geom_bar(aes(x=SNP_Status, fill=Group), position = "fill") + ggtitle("Distribution of Groups Among SNPs") + labs(x="SNP Status",y="Group Contribution")
 
 ggplot(recoded_geno) + geom_bar(aes(x=Group, fill=SNP_Status), position = "fill") + ggtitle("SNP Status/Group") + labs(x="Group",y="SNP Status Counts")
 ```
 
-## Question 3
+## Visualize whatever we want
 
 ## Decided to plot the distribution of SNPs from each group and plotted them against the chromosome number
-
-## Data Preparation is the same as for question 2
-
-## Load GGPlot Functions
-```{r}
-library(ggplot2)
-library(reshape2)
-library(tidyr)
-library(dplyr)
-```
-
-## Load in the data for visualization and remove unnecessary columns
-```{r}
-fang_genotypes<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/fang_et_al_genotypes.txt", header=T)
-fang<-fang_genotypes[,-2]
-snps<-read.delim(file = "~/BCB546X_R_Assignment/Raw_Data/snp_position.txt", header=T)
-trimmed_snps<-snps[,c("SNP_ID", "Chromosome", "Position")]
-```
-
-## Melting the data and renaming columns
-```{r}
-melted_geno<-melt(fang, id = c("Sample_ID", "Group"))
-melted_snps<-melt(trimmed_snps, id = c("SNP_ID", "Chromosome"))
-colnames(melted_geno)[3:4] <- c("SNP_ID","SNP_Seq")
-```
-
-## Merging the files
-```{r}
-joined_melted<-merge(melted_snps, melted_geno, by.x = 1, by.y = 3)
-joined_melted<-joined_melted[,-3]
-```
-
-
-## Adding SNP_Status column and coding ?/? to NA, Homozygous to Hom, and Heterozygous to Het
-```{r}
-joined_melted$SNP_Status<-"NA"
-joined_melted$SNP_Status<-joined_melted$SNP_Seq
-joined_melted$SNP_Status[joined_melted$SNP_Status=="?/?"]<- "NA"
-joined_melted$SNP_Status[joined_melted$SNP_Status=="A/A" | joined_melted$SNP_Status=="C/C" | joined_melted$SNP_Status=="G/G" | joined_melted$SNP_Status=="T/T"] <- "Hom"
-joined_melted$SNP_Status[joined_melted$SNP_Status!="Hom" & joined_melted$SNP_Status!="NA"] <- "Het"
-recoded_geno<-joined_melted
-sorted_recoded<-arrange(recoded_geno, Group, Sample_ID)
-```
 
 ```{r}
 ggplot(recoded_geno) + geom_bar(aes(x=Chromosome, fill=Group)) + ggtitle("SNP Number Per Group/Chromosome") + labs(x="Chromosome",y="SNP Counts Per Group")
