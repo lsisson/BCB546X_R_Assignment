@@ -1,0 +1,20 @@
+---
+title: "Zihao_review"
+author: "Zihao_Zheng"
+date: "10/16/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+In general, the codes are well documented and run smoothly. The files requried can be generated and visualization are satisfying.
+
+One possible improvement/alternative way is: 
+
+for line 84-85, it might be clearer for readling if the columns are renamed so there's a common column for the files to be merged.
+
+
+Good job! Lyle.
